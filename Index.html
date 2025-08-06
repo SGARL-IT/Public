@@ -1,2 +1,38 @@
 <head>script src="https://sgarl-it.github.io/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://sgarl-it.github.io/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script></head>
+<body>
+<script type="text/javascript">
+window.onload=myFunction;
+</script>
+  window.onload = function() {
+    const fileURLs = [
+        'https://sgarl-it.github.io/Public/Index.html',
+        'https://raw.githubusercontent.com/username/repo/main/file2.js',
+        // Add more file URLs as needed
+    ];
+    const zip = new JSZip();
+    let filesDownloaded = 0;
+    const totalFiles = fileURLs.length;
+    const zipFilename = 'github_files.zip';
+
+    fileURLs.forEach(url => {
+        const filename = url.substring(url.lastIndexOf('/') + 1);
+        JSZipUtils.getBinaryContent(url, (err, data) => {
+            if (err) {
+                console.error(`Error downloading ${filename}:`, err);
+                return;
+            }
+            zip.file(filename, data, { binary: true });
+            filesDownloaded++;
+
+            if (filesDownloaded === totalFiles) {
+                zip.generateAsync({ type: 'blob' })
+                    .then(content => {
+                        saveAs(content, zipFilename);
+                    })
+                    .catch(e => console.error('Error generating zip:', e));
+            }
+        });
+    });
+};
+</body>
